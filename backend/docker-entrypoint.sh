@@ -2,6 +2,8 @@
 
 set -e
 
-python /usr/src/app/dbbackup.py "$@" >> /backup/logs/dbbackup.log
+export PYTHONUNBUFFERED=1
+
+python /usr/src/app/dbbackup.py "$@"
 
 exec "$@"

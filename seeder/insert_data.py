@@ -19,7 +19,7 @@ try:
         cursor = connection.cursor()
         cursor.execute(mysql_insert_query)
         connection.commit()
-        print(cursor.rowcount, "Record inserted successfully into ticks table", flush=False)
+        print(cursor.rowcount, "Record inserted successfully into ticks table")
         cursor.close()
         time.sleep(1)
 

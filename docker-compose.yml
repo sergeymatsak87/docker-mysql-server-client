@@ -1,0 +1,65 @@
+version: '3.6'
+services:
+  mysql:
+    build: mysql
+    restart: always
+    container_name: mysql
+    environment:
+      - MYSQL_DATABASE=db
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_password
+    networks:
+      - app-network
+
+  seeder:
+    build: seeder
+    restart: on-failure
+    container_name: seeder
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_DATABASE=db
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=password
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+    entrypoint: ["/wait-for-mysql.sh", "mysql", "/docker-entrypoint.sh"]
+
+  backend:
+    build: backend
+    restart: always
+    container_name: backup-server
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_DATABASE=db
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=password
+    networks:
+      - app-network
+    volumes:
+      - backend-file:/backup/logs
+    depends_on:
+      - mysql
+    entrypoint: ["/wait-for-mysql.sh", "mysql", "/docker-entrypoint.sh"]
+
+  client:
+    build: client
+    restart: always
+    container_name: backup-client
+    networks:
+      - app-network
+    volumes:
+      - backend-file:/var/www
+    ports:
+      - 8000:8000
+    depends_on:
+      - backend
+
+volumes:
+  backend-file:
+
+networks:
+  app-network:
+   name: app-global-network
